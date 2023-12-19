@@ -21,8 +21,11 @@ class Client:
     def envoie_mesg(self):
         while self.running:
             msg = input()
-            self.server_socket.send(msg.encode('utf-8'))
+            self.server_socket.send(bytes(msg,'utf-8'))
+            if msg == "exit":
+                break
         self.server_socket.close()
+
 
     def recevoir_msg (self):
         while self.running:
