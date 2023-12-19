@@ -1,14 +1,14 @@
 import socket
 import select
-import psycopg
+import psycopg2
 
 # Connexion à la base de données PostgreSQL
 conn = psycopg2.connect(
     database="messagerie_db",
     user="votre_utilisateur",
     password="votre_mot_de_passe",
-    host="localhost",
-    port="votre_port"
+    host="127.0.0.1",
+    port="6666"
 )
 
 # Création d'un curseur pour exécuter des requêtes SQL
