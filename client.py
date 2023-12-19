@@ -16,9 +16,14 @@ class Client:
             print("Erreur la connexion au serveur a echouée : ", str(e))
 
     def envoie_mesg(self):
-        while True:
+        while self.running:
             msg = input()
-            self.server_socket.send(msg.encode('utf-8'))
+            self.server_socket.send(bytes(msg,'utf-8'))
+ 
+            if msg == "exit":
+                break
+    
+    
     def recevoir_msg (self):
         while True:
             try:
