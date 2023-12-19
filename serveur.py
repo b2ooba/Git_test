@@ -3,8 +3,7 @@ import socket
 import select 
 
 serveur = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-host = "127.0.0.1"
-port = 6666
+host, port = "127.0.0.1", 6666
 serveur.bind((host, port))
 serveur.listen(4)
 client_connectee = True
@@ -19,9 +18,10 @@ while client_connectee:
         #Nouvelle connexion entrante 
         if socket_obj is serveur:
             client, adresse = serveur.accept()
-            socket_objs.append(socket_obj)
+            print(f"l'object client socket: {client} - adress: {adresse}")
+            socket_objs.append(client)
         
-        #Données réçus d'un client 
+        #Données réçus d'un client  
         else:
             donnee_reçus = socket_obj.recv(128).decode("utf-8")
 
@@ -30,8 +30,9 @@ while client_connectee:
 
             #Le client s'est connectée
             else:
+                socket_objs.remove(socket_obj)
                 print("Un participant est déconnecté")
-                print(f"{len(socket_objs) - 1} participants restant")     
+                print(f"{len(socket_objs) - 1} participants restant")
 
 
 
