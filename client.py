@@ -31,7 +31,8 @@ class Client:
             #Envoi du message au serveur
             self.server_socket.send(bytes(msg,'utf-8'))
             # Si le message est exit, le client se déconnecte
-            if msg == "exit":
+            if msg == "/exit":
+                print("Déconnection en cours.....")
                 break
     
     
