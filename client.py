@@ -2,7 +2,7 @@ import threading
 import socket
 
 class Client:
-    def __init__(self, server_ip = "127.0.0.1", port=55555):
+    def __init__(self, server_ip = "127.0.0.1", port=6666):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect_to_server(server_ip, port)
         self.running = True
@@ -11,14 +11,21 @@ class Client:
         try:
             print("Connection en cours (°_°)")
             self.server_socket.connect((ip,port))
+            pseudo = input("entrez votre pseudo: ")
+            self.server_socket.send(bytes(pseudo,"utf-8"))
             print("Connectée.")
         except Exception as e:
             print("Erreur la connexion au serveur a echouée : ", str(e))
 
     def envoie_mesg(self):
-        while True:
+        while self.running:
             msg = input()
-            self.server_socket.send(msg.encode('utf-8'))
+            self.server_socket.send(bytes(msg,'utf-8'))
+ 
+            if msg == "exit":
+                break
+    
+    
     def recevoir_msg (self):
         while True:
             try:
