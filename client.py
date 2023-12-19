@@ -11,6 +11,8 @@ class Client:
         try:
             print("Connection en cours (°_°)")
             self.server_socket.connect((ip,port))
+            pseudo = input("entrez votre pseudo: ")
+            self.server_socket.send(bytes(pseudo,"utf-8"))
             print("Connectée.")
         except Exception as e:
             print("Erreur la connexion au serveur a echouée : ", str(e))
