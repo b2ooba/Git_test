@@ -14,7 +14,7 @@ app.iconbitmap("logo.ico")
 # Paramétrage Switch
 btnEtat = False
 
-# Chargement image Navbar
+Chargement image Navbar
 navIcon = PhotoImage(file='/Users/marjane/Git_test/marjane/menu.png')
 closeIcon = PhotoImage(file='/Users/marjane/Git_test/marjane/close.png')
 imgFond = PhotoImage(file='/Users/marjane/Git_test/marjane/back_image3.png')
