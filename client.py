@@ -17,6 +17,7 @@ class Client:
             self.server_socket.connect((ip,port))
             #Demande de pseudo au client
             pseudo = input("entrez votre pseudo: ")
+            self.pseudo = pseudo
             # Envoie du pseudo au serveur
             self.server_socket.send(bytes(pseudo,"utf-8"))
             print("Connectée.")
@@ -27,9 +28,9 @@ class Client:
         #Boucle pour envoyer des messages tant que le client et connectée  au serveur
         while self.running:
             #création du message souhaitée
-            msg = input()
+            msg = input(f"{self.pseudo}> ")
             #Envoi du message au serveur
-            self.server_socket.send(bytes(msg,'utf-8'))
+            self.server_socket.send(f"{self.pseudo} > {msg}".encode("utf-8"))
             # Si le message est exit, le client se déconnecte
             if msg == "/exit":
                 print("Déconnection en cours.....")
