@@ -29,6 +29,7 @@ class Client:
         while self.running:
             #création du message souhaitée
             msg = input(f"{self.pseudo}> ")
+            self.msg = msg
             #Envoi du message au serveur
             self.server_socket.send(f"{self.pseudo} > {msg}".encode("utf-8"))
             # Si le message est exit, le client se déconnecte
@@ -42,14 +43,14 @@ class Client:
         while True:
             try:
                 #Réception des données depuis le serveur
-                data = self.server_socket.recv(4096).decode('utf-8')
+                self.msg = self.server_socket.recv(1024).decode('utf-8')
                 # Vérification si les donnéees ne sont pas vides
-                if not data:
+                if not self.msg:
                     print("erreur")
                     self.running = False
                     break
                 else: 
-                    print(data)
+                    print(self.msg)
             except Exception as e :
                 print("erreur :", str(e))
                 self.running = False
