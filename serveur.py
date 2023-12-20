@@ -1,5 +1,5 @@
 import socket  # Importer le module de gestion des sockets
-import threading  # Importer le module threading pour les thread
+import threading  # Importer le module threading pour les threade
 
 # Création d'un socket serveur TCP IPv4
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
