@@ -12,6 +12,7 @@ server.listen(10)              # Met le serveur en mode écoute pour jusqu'à 10
 clients =[]
 pseudos = []
 
+#diffusion des messages 
 def diffuser(message):
     for client in clients:
         client.send(bytes(message, "utf-8"))
