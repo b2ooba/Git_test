@@ -13,7 +13,6 @@ def diffuser(message):
     for client in clients:
         client.send(bytes(message, "utf-8"))
 
-
 def gestion_connexions():
     while True:
         client, adresse = server.accept() 
