@@ -1,5 +1,8 @@
+import socket  # Importe le module de gestion des sockets
+import select  # Importe le module Tkinter pour afficher des boîtes de dialogue
 import socket  # Importer le module de gestion des sockets
 import threading  # Importer le module threading pour les threade
+
 
 # Création d'un socket serveur TCP IPv4
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -12,6 +15,7 @@ pseudos = []
 def diffuser(message):
     for client in clients:
         client.send(bytes(message, "utf-8"))
+
 
 def gestion_connexions():
     while True:
@@ -51,5 +55,3 @@ def gestion_client(client, pseudo):
 
 gestion_connexions()
 print("Le serveur de chat est en marche")
-               
-    
