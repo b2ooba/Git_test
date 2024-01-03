@@ -1,62 +1,55 @@
 import socket
-import select
-import psycopg2
-
-# Connexion à la base de données PostgreSQL
-conn = psycopg2.connect(
-    database="messagerie_db",
-    user="votre_utilisateur",
-    password="votre_mot_de_passe",
-    host="127.0.0.1",
-    port="6666"
-)
-
-# Création d'un curseur pour exécuter des requêtes SQL
-cursor = conn.cursor()
+import threading
 
 # Création d'un socket serveur TCP IPv4
 serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host, port = "127.0.0.1", 6666  # Adresse IP du serveur et le port d'écoute
-serveur.bind((host, port))      # Associe le socket à l'adresse et au port spécifiés
-serveur.listen(50)              # Met le serveur en mode écoute pour jusqu'à 50 connexions entrantes
-client_connecte = True          # Indicateur de connexion client
-socket_objs = [serveur]         # Liste des sockets à surveiller
+IP, port = "127.0.0.1", 6666
+serveur.bind((IP, port))
+serveur.listen(10)
+clients = []
+pseudos = {}
 
-print("Bienvenue dans la conversation !!!")
+def diffuser(message, expeditaire=None, destinataire=None):
+    for client, pseudo in pseudos.items():
+        if destinataire is None or pseudo == destinataire:
+            if client != expeditaire:
+                client.send(bytes(message, "utf-8"))
 
-# Boucle principale du serveur
-while client_connecte:
-    # Sélection des sockets prêts à être lus
-    liste_lue, liste_access_ecrit, exception = select.select(socket_objs, [], socket_objs)
+def gestion_connexions():
+    while True:
+        client, adresse = serveur.accept()
+        print(f"Connexion établie avec {str(adresse)}")
+        pseudo = client.recv(1024).decode("utf-8")
+        clients.append(client)
+        pseudos[client] = pseudo
+        print(f"{pseudo} a rejoint le chat")
+        client.send(bytes("Bienvenue dans le chat !\n", "utf-8"))
+        diffuser(f"{pseudo} a rejoint le chat!", destinataire=pseudo)
+        thread_client = threading.Thread(target=gestion_client, args=(client, pseudo))
+        thread_client.start()
 
-    # Parcours des sockets prêts à être lus
-    for socket_obj in liste_lue:
-
-        # Nouvelle connexion entrante
-        if socket_obj is serveur:
-            client, adresse = serveur.accept()  # Accepte la connexion du client
-            print(f"Objet client socket: {client} - adresse: {adresse}")
-            socket_objs.append(client)  # Ajoute le socket du client à la liste des sockets à surveiller
-
-        # Données reçues d'un client
-        else:
-            donnee_recue = socket_obj.recv(128).decode("utf-8")  # Reçoit des données du client
-
-            if donnee_recue:
-                print(donnee_recue)  # Affiche les données reçues
-
-                # Exemple d'insertion dans la base de données
-                cursor.execute("INSERT INTO messages (contenu, expediteur, destinataire) VALUES (%s, %s, %s)",
-                               (donnee_recue, "expediteur_par_defaut", "destinataire_par_defaut"))
-                conn.commit()
-
-            # Le client s'est déconnecté
+def gestion_client(client, pseudo):
+    while True:
+        try:
+            message = client.recv(1024).decode("utf-8")
+            if message.startswith("@"):
+                destinataire, message_prive = message.split(" ", 1)
+                destinataire = destinataire[1:]
+                diffuser(f"(Privé) {pseudo}: {message_prive}", expeditaire=client, destinataire=destinataire)
+            elif message == "ecrit":
+                clients.remove(client)
+                client.close()
+                del pseudos[client]
+                diffuser(f"{pseudo} a quitté le chat!")
+                break
             else:
-                socket_objs.remove(socket_obj)  # Retire le socket du client de la liste des sockets surveillés
-                print("Un participant est déconnecté")
-                print(f"{len(socket_objs) - 1} participants restants")
+                diffuser(f"{pseudo}: {message}")
+        except:
+            clients.remove(client)
+            client.close()
+            del pseudos[client]
+            diffuser(f"{pseudo} a quitté le chat!")
+            break
 
-# Fermeture propre de la connexion à la base de données
-cursor.close()
-conn.close()
-###test###
+gestion_connexions()
+print("Le serveur de chat est en marche")
