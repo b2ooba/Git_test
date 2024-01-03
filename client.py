@@ -36,8 +36,13 @@ class Client:
             if msg == "/exit":
                 print("Déconnection en cours.....")
                 break
-    
-    
+            #if msg == "/new": # Si le message est new, une nouvelle discussion est créé.
+                # nouvelle_discussion = msg.split("", 1) # 
+                #self.server_socket.send(f"/new {nouvelle_discussion}".encode("utf-8"))
+                #print(f"VOus avez crée une nouvelle discussion'{nouvelle_discussion}'.")
+            #else: #
+                #self.server_socket.send(f"{self.pseudo}>{msg}".encode("utf-8"))
+                
     def recevoir_msg (self):
         #Boucle pour recevoir des messages tant que le client est connectée au serveur
         while True:
