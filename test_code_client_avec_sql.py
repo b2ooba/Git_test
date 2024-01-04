@@ -29,7 +29,7 @@ class Client:
             # Création du message souhaité
             destinataire = input("Entrez le pseudo du destinataire (ou 'tous' pour envoyer à tous): ")
             msg = input("Entrez votre message: ")
-
+        
             # Envoi du message au serveur avec le pseudo du destinataire
             self.server_socket.send(bytes(f"{destinataire}:{msg}", 'utf-8'))
 
