@@ -58,11 +58,11 @@ class Client:
 
     def start_threads(self):
         # Création des threads pour gérer l'envoi et la réception de messages simultanée
-        envoyee_msg = threading.Thread(target=self.envoie_mesg)
         reception_msg = threading.Thread(target=self.recevoir_msg)
+        envoyee_msg = threading.Thread(target=self.envoie_mesg)
         # Démarrée les threads
-        envoyee_msg.start()
         reception_msg.start()
+        envoyee_msg.start()
 
 # Instanciation du client et démarrage des threads
 client = Client()
