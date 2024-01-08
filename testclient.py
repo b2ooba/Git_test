@@ -1,16 +1,5 @@
 import threading
 import socket
-from flask import Flask, render_template, request
-
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return render_template('login_page.html')
-
-@app.route('/create_account')
-def create_account():
-    return render_template('sigup.page.html')
 
 class Client:
     def __init__(self, server_ip="127.0.0.1", port=6666):
@@ -38,7 +27,7 @@ class Client:
             # Réception du message de bienvenue quand la connexion au serveur est réussie
             message_bienvenue = self.server_socket.recv(4096).decode('utf-8')
             print(message_bienvenue)
-            # Appel à la fonction création_compte
+            # Appel à la fonction creation_compte
             self.creation_compte()
         except Exception as e:  # Montre le message d'erreur pour la connexion au serveur (s'il y en a)
             print("Erreur la connexion au serveur a échoué : ", str(e))
@@ -99,6 +88,5 @@ class Client:
         envoyee_msg.start()
 
 if __name__ == "__main__":
-    threading.Thread(target=app.run).start()
     client = Client()
     client.start_threads()
