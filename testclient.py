@@ -20,9 +20,34 @@ class Client:
             self.pseudo = pseudo
             # Envoie du pseudo au serveur
             self.server_socket.send(bytes(pseudo,"utf-8"))
-            print("Connectée.")
+            #Création du mot de passe au client
+            mot_de_passe = input("Entrez votre mot de passe: ")
+            # Envoie du mot de passe au serveur
+            self.server_socket.send(bytes(mot_de_passe,"utf-8"))
+            # Réception du message de bienvenu quand la connexion au serveur est réussi
+            message_bienvenue = self.server_socket.recv(4096).decode('utf-8')
+            print(message_bienvenue)
+            self.création_compte()
         except Exception as e: # montre le message d'erreur pour la connexion au serveur (si il y en a)
             print("Erreur la connexion au serveur a echouée : ", str(e))
+
+    def création_compte(self):
+        """Permet à l'utilisateur de créer un compte"""
+        pseudo = input("Entrer le pseudo que vous souhaitez utiliser: ")
+        password = input("Entrer votre mot de passe: ")
+        confirmation_mot_de_passe = input("Confirmez votre mot de passe: ")
+        if password == confirmation_mot_de_passe:
+            self.server_socket.send(bytes(f"CREATEACCOUNT {pseudo}:{password}", "utf-8"))
+            reponse = self.server_socket.recv(4096).decode('utf-8').split("\n")[0]
+            if reponse == "OK":
+                print("Compte créé avec succès.")
+                self.login()
+            else:
+                print("Erreur lors de la création du compte.")
+        else:
+             print("Les mots de passe ne correspondent pas.")
+
+
 
     def envoie_mesg(self):
         #Boucle pour envoyer des messages tant que le client et connectée  au serveur

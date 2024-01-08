@@ -1,8 +1,56 @@
+import socket
+import threading
+import sqlite3
+
 # Création d'un socket serveur TCP IPv4
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-IP, port = "127.0.0.1", 6666  # Adresse IP du serveur et le port d'écoute
-server.bind((IP, port))      # Associe le socket à l'adresse et au port spécifiés
-server.listen(10)              # Met le serveur en mode écoute pour jusqu'à 10 connexions entrantes
+IP, port = "127.0.0.1", 6666
+server.bind((IP, port))
+server.listen(10)
+clients = []
+pseudos = {}
+
+# Diffusion des messages privés
+def message(sender, receiver, message):
+    if receiver in pseudos:
+        receiver_client = pseudos[receiver]
+        sender.send(bytes(f"Message privé pour {receiver}: {message}", "utf-8"))
+        receiver_client.send(bytes(f"Message privé de {sender}: {message}", "utf-8"))
+    else:
+        sender.send(bytes(f"Erreur: {receiver} n'est pas connecté ou n'existe pas.", "utf-8"))
+
+def diffuser(message, sender=None):
+    for client in clients:
+        if client != sender:
+            client.send(bytes(message, "utf-8"))
+
+def gestion_client(client, pseudo):
+    while True:
+        try:
+            message = client.recv(1024).decode("utf-8")
+            if message == "/exit":
+                index = clients.index(client)
+                clients.remove(client)
+                pseudo = pseudos.pop(pseudo)
+                client.close()
+                diffuser(f"{pseudo} a quitté le chat!")
+                break
+            elif message.startswith("@"):
+                # Format du message privé : @destinataire message
+                parts = message.split(" ", 1)
+                if len(parts) == 2:
+                    message(pseudo, parts[0][1:], parts[1])
+                else:
+                    client.send(bytes("Format incorrect pour le message privé. Utilisez @destinataire message", "utf-8"))
+            else:
+                diffuser(f"{pseudo}: {message}", client)
+        except:
+            index = clients.index(client)
+            clients.remove(client)
+            pseudo = pseudos.pop(pseudo)
+            client.close()
+            diffuser(f"{pseudo} a quitté le chat!")
+            break
 
 # Connexion à la base de données SQLite
 conn = sqlite3.connect('chat_database.db')
@@ -40,14 +88,6 @@ cursor.execute('''
 ''')
 conn.commit()
 
-clients = []
-pseudos = []
-
-# Diffusion des messages
-def diffuser(message):
-    for client in clients:
-        client.send(bytes(message, "utf-8"))
-
 # Fonction pour ajouter un utilisateur à la base de données
 def ajouter_utilisateur_db(pseudo, mot_de_passe):
     cursor.execute("INSERT INTO utilisateurs (pseudo, mot_de_passe) VALUES (?, ?)", (pseudo, mot_de_passe))
@@ -72,7 +112,7 @@ def stocker_message_db(expediteur, destinataire, message):
 def recuperer_messages_db(expediteur, destinataire):
     cursor.execute("SELECT * FROM messages WHERE (expediteur=? AND destinataire=?) OR (expediteur=? AND destinataire=?) ORDER BY id", (expediteur, destinataire, destinataire, expediteur))
     return cursor.fetchall()
-
+ 
 # Fonction pour gérer les connexions des clients
 def gestion_connexions():
     while True:
@@ -83,7 +123,6 @@ def gestion_connexions():
         client.send(bytes("Bienvenue ! Veuillez créer un compte.\nEntrez votre pseudo : ", "utf-8"))
         pseudo = client.recv(1024).decode("utf-8")
 
-        # Vérifier si le pseudo existe déjà
         cursor.execute("SELECT * FROM utilisateurs WHERE pseudo=?", (pseudo,))
         utilisateur_existe = cursor.fetchone() is not None
 
@@ -92,7 +131,6 @@ def gestion_connexions():
             client.close()
             continue
 
-        # Demander et vérifier les mots de passe
         mot_de_passe = client.recv(1024).decode("utf-8")
         client.send(bytes("Confirmez votre mot de passe : ", "utf-8"))
         confirmation_mot_de_passe = client.recv(1024).decode("utf-8")
@@ -102,24 +140,31 @@ def gestion_connexions():
             client.close()
             continue
 
-        ajouter_utilisateur_db(pseudo, mot_de_passe)
-        ajouter_client_db(pseudo, adresse[0], adresse[1])
+        # Vérifier l'authentification de l'utilisateur avant de rejoindre le chat
+        if verifier_authentification(pseudo, mot_de_passe):
+            ajouter_client_db(pseudo, adresse[0], adresse[1])
 
-        clients.append(client)
-        pseudos.append(pseudo)
-        print(f"{pseudo} a rejoint le chat")
-        client.send(bytes("Bienvenue dans le chat !\n", "utf-8"))
+            clients.append(client)
+            pseudos[pseudo] = client
+            print(f"{pseudo} a rejoint le chat")
+            client.send(bytes("Bienvenue dans le chat !\n", "utf-8"))
 
-        # Page de connexion
-        client.send(bytes("Entrez votre pseudo pour vous connecter : ", "utf-8"))
-        pseudo_connexion = client.recv(1024).decode("utf-8")
+            # Page de connexion
+            client.send(bytes("Entrez votre pseudo pour vous connecter : ", "utf-8"))
+            pseudo_connexion = client.recv(1024).decode("utf-8")
 
-        # Vérifier l'authentification de l'utilisateur
-        mot_de_passe_connexion = client.recv(1024).decode("utf-8")
-        if not verifier_authentification(pseudo_connexion, mot_de_passe_connexion):
-            print(f"Tentative de connexion non autorisée pour {pseudo_connexion}")
+            mot_de_passe_connexion = client.recv(1024).decode("utf-8")
+            if verifier_authentification(pseudo_connexion, mot_de_passe_connexion):
+                print(f"{pseudo_connexion} s'est connecté.")
+                client.send(bytes(f"Bienvenue {pseudo_connexion}!\n", "utf-8"))
+                threading.Thread(target=gestion_client, args=(client, pseudo_connexion)).start()
+            else:
+                print(f"Tentative de connexion non autorisée pour {pseudo_connexion}")
+                client.send(bytes("Erreur d'authentification. Veuillez créer un compte avant de vous connecter.", "utf-8"))
+                client.close()
+        else:
             client.send(bytes("Erreur d'authentification. Veuillez créer un compte avant de vous connecter.", "utf-8"))
             client.close()
-            continue
 
-        # Récupérer tous les messages entre
+# Lancer la gestion des connexions dans un thread séparé
+threading.Thread(target=gestion_connexions).start()
