@@ -1,9 +1,6 @@
 import socket
 import threading
 import sqlite3
-from flask import Flask, render_template, request
-
-app = Flask(__name__)
 
 # Initialisation du socket serveur TCP IPv4
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -102,15 +99,11 @@ def retrieve_messages_from_db(expediteur, destinataire):
 
 # Fonction pour gérer les connexions des clients
 def handle_connections():
-    local_conn = threading.local()
-    local_conn.conn = sqlite3.connect('chat_database.db')
-    local_conn.cursor = local_conn.conn.cursor()
-
     while True:
         client, adresse = server.accept()
         print(f"Connexion établie avec {str(adresse)}")
 
-        # Page de création de compte
+        # Page de création de compte ou de connexion
         client.send(bytes("Bienvenue ! Veuillez créer un compte ou vous connecter.\nEntrez votre pseudo : ", "utf-8"))
         pseudo = client.recv(1024).decode("utf-8").strip()
 
@@ -145,4 +138,3 @@ def handle_connections():
 
 if __name__ == "__main__":
     threading.Thread(target=handle_connections).start()
-    threading.Thread(target=app.run).start()

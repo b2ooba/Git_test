@@ -48,6 +48,10 @@ class Client:
         else:
             print("Les mots de passe ne correspondent pas.")
 
+    def login(self):
+        # Logique pour le processus de connexion
+        pass
+
     def envoie_mesg(self):
         # Boucle pour envoyer des messages tant que le client est connecté au serveur
         while self.running:
