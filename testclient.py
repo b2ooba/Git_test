@@ -29,37 +29,43 @@ class Client:
         while self.running:
             #création du message souhaitée
             msg = input(f"{self.pseudo}> ")
+            self.msg = msg
             #Envoi du message au serveur
             self.server_socket.send(f"{self.pseudo} > {msg}".encode("utf-8"))
             # Si le message est exit, le client se déconnecte
             if msg == "/exit":
                 print("Déconnection en cours.....")
                 break
-    
-    
+            #if msg == "/new": # Si le message est new, une nouvelle discussion est créé.
+                # nouvelle_discussion = msg.split("", 1) # 
+                #self.server_socket.send(f"/new {nouvelle_discussion}".encode("utf-8"))
+                #print(f"VOus avez crée une nouvelle discussion'{nouvelle_discussion}'.")
+            #else: #
+                #self.server_socket.send(f"{self.pseudo}>{msg}".encode("utf-8"))
+                
     def recevoir_msg (self):
         #Boucle pour recevoir des messages tant que le client est connectée au serveur
-        while self.running:
+        while True:
             try:
                 #Réception des données depuis le serveur
-                data = self.server_socket.recv(1024).decode('utf-8')
+                self.msg = self.server_socket.recv(1024).decode('utf-8')
                 # Vérification si les donnéees ne sont pas vides
-                if not data:
+                if not self.msg:
                     print("erreur")
                     self.running = False
                     break
                 else: 
-                    print(data)
+                    print(self.msg)
             except Exception as e :
                 print("erreur :", str(e))
                 self.running = False
                 break
     def start_threads (self):
         # Création des threads pour gérer l'envoi et la réception de messages simultanée
-        envoyee_msg = threading.Thread(target=self.envoie_mesg)
         reception_msg = threading.Thread(target=self.recevoir_msg)
+        envoyee_msg = threading.Thread(target=self.envoie_mesg)
         # Démarrée les threads
-        envoyee_msg.start()
         reception_msg.start()
+        envoyee_msg.start()        
 client = Client()
 client.start_threads()
