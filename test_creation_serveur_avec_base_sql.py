@@ -79,7 +79,7 @@ conn.commit()
 
 # Fonction pour ajouter un client à la base de données
 def ajouter_client_db(pseudo, address, port):
-    cursor.execute("INSERT INTO clients (pseudo, mdp) VALUES (?, ?)", (pseudo, address, port))
+    cursor.execute("INSERT INTO clients (pseudo, mdp) VALUES (?, ?)", (pseudo, mdp))
     conn.commit()
 
 # Fonction pour vérifier les informations d'authentification d'un client
