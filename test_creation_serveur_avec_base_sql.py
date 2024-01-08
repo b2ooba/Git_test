@@ -11,7 +11,7 @@ clients = []
 pseudos = {}
 
 # Diffusion des messages privés
-def message(sender, receiver, message):
+def message(sender, receiver, message): 
     if receiver in pseudos:
         receiver_client = pseudos[receiver]
         sender.send(bytes(f"Message privé pour {receiver}: {message}", "utf-8"))
@@ -61,7 +61,7 @@ cursor.execute('''
     CREATE TABLE IF NOT EXISTS utilisateurs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         pseudo TEXT UNIQUE,
-        mot_de_passe TEXT
+        mdp TEXT
     )
 ''')
 conn.commit()
@@ -77,31 +77,15 @@ cursor.execute('''
 ''')
 conn.commit()
 
-# Création de la table 'clients' pour stocker les informations de connexion
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS clients (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        pseudo TEXT,
-        address TEXT,
-        port INTEGER
-    )
-''')
-conn.commit()
-
-# Fonction pour ajouter un utilisateur à la base de données
-def ajouter_utilisateur_db(pseudo, mot_de_passe):
-    cursor.execute("INSERT INTO utilisateurs (pseudo, mot_de_passe) VALUES (?, ?)", (pseudo, mot_de_passe))
-    conn.commit()
-
-# Fonction pour vérifier les informations d'authentification d'un utilisateur
-def verifier_authentification(pseudo, mot_de_passe):
-    cursor.execute("SELECT * FROM utilisateurs WHERE pseudo=? AND mot_de_passe=?", (pseudo, mot_de_passe))
-    return cursor.fetchone() is not None
-
 # Fonction pour ajouter un client à la base de données
 def ajouter_client_db(pseudo, address, port):
-    cursor.execute("INSERT INTO clients (pseudo, address, port) VALUES (?, ?, ?)", (pseudo, address, port))
+    cursor.execute("INSERT INTO clients (pseudo, mdp) VALUES (?, ?)", (pseudo, address, port))
     conn.commit()
+
+# Fonction pour vérifier les informations d'authentification d'un client
+def verifier_authentification(pseudo, mot_de_passe):
+    cursor.execute("SELECT * FROM utilisateurs WHERE pseudo=? AND mdp=?", (pseudo, mdp))
+    return cursor.fetchone() is not None
 
 # Fonction pour stocker un message dans la base de données
 def stocker_message_db(expediteur, destinataire, message):
@@ -113,8 +97,12 @@ def recuperer_messages_db(expediteur, destinataire):
     cursor.execute("SELECT * FROM messages WHERE (expediteur=? AND destinataire=?) OR (expediteur=? AND destinataire=?) ORDER BY id", (expediteur, destinataire, destinataire, expediteur))
     return cursor.fetchall()
  
-# Fonction pour gérer les connexions des clients
+# Fonction pour gérer les connexions des clients à l'intérieur de votre fonction gestion_connexions
 def gestion_connexions():
+    local_conn = threading.local()
+    local_conn.conn = sqlite3.connect('chat_database.db')
+    local_conn.cursor = local_conn.conn.cursor()
+
     while True:
         client, adresse = server.accept()
         print(f"Connexion établie avec {str(adresse)}")
@@ -123,25 +111,25 @@ def gestion_connexions():
         client.send(bytes("Bienvenue ! Veuillez créer un compte.\nEntrez votre pseudo : ", "utf-8"))
         pseudo = client.recv(1024).decode("utf-8")
 
-        cursor.execute("SELECT * FROM utilisateurs WHERE pseudo=?", (pseudo,))
-        utilisateur_existe = cursor.fetchone() is not None
+        local_conn.cursor.execute("SELECT * FROM utilisateurs WHERE pseudo=?", (pseudo,))
+        utilisateur_existe = local_conn.cursor.fetchone() is not None
 
         if utilisateur_existe:
             client.send(bytes("Ce pseudo est déjà pris. Veuillez choisir un autre pseudo.", "utf-8"))
             client.close()
             continue
 
-        mot_de_passe = client.recv(1024).decode("utf-8")
+        mdp = client.recv(1024).decode("utf-8")
         client.send(bytes("Confirmez votre mot de passe : ", "utf-8"))
-        confirmation_mot_de_passe = client.recv(1024).decode("utf-8")
+        confirmation_mdp = client.recv(1024).decode("utf-8")
 
-        if mot_de_passe != confirmation_mot_de_passe:
+        if mdp != confirmation_mdp:
             client.send(bytes("Les mots de passe ne correspondent pas. Fermeture de la connexion.", "utf-8"))
             client.close()
             continue
 
         # Vérifier l'authentification de l'utilisateur avant de rejoindre le chat
-        if verifier_authentification(pseudo, mot_de_passe):
+        if verifier_authentification(pseudo, mdp):
             ajouter_client_db(pseudo, adresse[0], adresse[1])
 
             clients.append(client)
@@ -153,8 +141,8 @@ def gestion_connexions():
             client.send(bytes("Entrez votre pseudo pour vous connecter : ", "utf-8"))
             pseudo_connexion = client.recv(1024).decode("utf-8")
 
-            mot_de_passe_connexion = client.recv(1024).decode("utf-8")
-            if verifier_authentification(pseudo_connexion, mot_de_passe_connexion):
+            mdp_connexion = client.recv(1024).decode("utf-8")
+            if verifier_authentification(pseudo_connexion, mdp_connexion):
                 print(f"{pseudo_connexion} s'est connecté.")
                 client.send(bytes(f"Bienvenue {pseudo_connexion}!\n", "utf-8"))
                 threading.Thread(target=gestion_client, args=(client, pseudo_connexion)).start()
@@ -167,5 +155,4 @@ def gestion_connexions():
             client.close()
 
 # Lancer la gestion des connexions dans un thread séparé
-threading.Thread(target=gestion_connexions).start()
 threading.Thread(target=gestion_connexions).start()
