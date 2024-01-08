@@ -3,44 +3,37 @@ import socket
 
 class Client:
     def __init__(self, server_ip="127.0.0.1", port=6666):
-        # Initialisation du socket client
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # État du client (actif ou non)
         self.running = True
-        # Connection au serveur
         self.connect_to_server(server_ip, port)
 
     def connect_to_server(self, ip, port):
         try:
             print("Connection en cours (°_°)")
-            # Connection au serveur
             self.server_socket.connect((ip, port))
-            # Demande de pseudo au client
             pseudo = input("Entrez votre pseudo: ")
             self.pseudo = pseudo
-            # Envoi du pseudo au serveur
             self.server_socket.send(bytes(pseudo, "utf-8"))
-            # Création du mot de passe au client
-            mot_de_passe = input("Entrez votre mot de passe: ")
-            # Envoi du mot de passe au serveur
-            self.server_socket.send(bytes(mot_de_passe, "utf-8"))
-            # Réception du message de bienvenue quand la connexion au serveur est réussie
-            message_bienvenue = self.server_socket.recv(4096).decode('utf-8')
-            print(message_bienvenue)
-            # Appel à la fonction creation_compte
-            self.creation_compte()
-        except Exception as e:  # Montre le message d'erreur pour la connexion au serveur (s'il y en a)
-            print("Erreur la connexion au serveur a échoué : ", str(e))
+            self.handle_welcome_message()
+        except Exception as e:
+            print(f"Erreur la connexion au serveur a échoué : {str(e)}")
 
-    def creation_compte(self):
-        """Permet à l'utilisateur de créer un compte"""
+    def handle_welcome_message(self):
+        message = self.server_socket.recv(4096).decode('utf-8')
+        print(message)
+        if "Veuillez créer un compte" in message:
+            self.create_account()
+
+    def create_account(self):
         pseudo = input("Entrer le pseudo que vous souhaitez utiliser: ")
         password = input("Entrer votre mot de passe: ")
-        confirmation_mot_de_passe = input("Confirmez votre mot de passe: ")
-        if password == confirmation_mot_de_passe:
+        confirmation_password = input("Confirmez votre mot de passe: ")
+
+        if password == confirmation_password:
             self.server_socket.send(bytes(f"CREATEACCOUNT {pseudo}:{password}", "utf-8"))
-            reponse = self.server_socket.recv(4096).decode('utf-8').split("\n")[0]
-            if reponse == "OK":
+            response = self.server_socket.recv(4096).decode('utf-8').split("\n")[0]
+
+            if response == "OK":
                 print("Compte créé avec succès.")
                 self.login()
             else:
@@ -48,30 +41,25 @@ class Client:
         else:
             print("Les mots de passe ne correspondent pas.")
 
-    def login(self):
-        # Logique pour le processus de connexion
-        pass
+    def start_threads(self):
+        reception_msg = threading.Thread(target=self.receive_msg)
+        send_msg = threading.Thread(target=self.send_msg)
+        reception_msg.start()
+        send_msg.start()
 
-    def envoie_mesg(self):
-        # Boucle pour envoyer des messages tant que le client est connecté au serveur
+    def send_msg(self):
         while self.running:
-            # Création du message souhaité
             msg = input(f"{self.pseudo}> ")
             self.msg = msg
-            # Envoi du message au serveur
             self.server_socket.send(f"{self.pseudo} > {msg}".encode("utf-8"))
-            # Si le message est "/exit", le client se déconnecte
             if msg == "/exit":
                 print("Déconnection en cours.....")
                 break
 
-    def recevoir_msg(self):
-        # Boucle pour recevoir des messages tant que le client est connecté au serveur
+    def receive_msg(self):
         while True:
             try:
-                # Réception des données depuis le serveur
                 self.msg = self.server_socket.recv(1024).decode('utf-8')
-                # Vérification si les données ne sont pas vides
                 if not self.msg:
                     print("Erreur")
                     self.running = False
@@ -82,14 +70,6 @@ class Client:
                 print("Erreur :", str(e))
                 self.running = False
                 break
-
-    def start_threads(self):
-        # Création des threads pour gérer l'envoi et la réception de messages simultanée
-        reception_msg = threading.Thread(target=self.recevoir_msg)
-        envoyee_msg = threading.Thread(target=self.envoie_mesg)
-        # Démarrage des threads
-        reception_msg.start()
-        envoyee_msg.start()
 
 if __name__ == "__main__":
     client = Client()
