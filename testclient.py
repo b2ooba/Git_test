@@ -3,83 +3,89 @@ import socket
 
 class Client:
     def __init__(self, server_ip="127.0.0.1", port=6666):
+        # Initialisation du socket client
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connect_to_server(server_ip, port)
+        # État du client (actif ou non)
         self.running = True
-        self.pseudo = ""
+        # Connection au serveur
+        self.connect_to_server(server_ip, port)
 
     def connect_to_server(self, ip, port):
         try:
-            print("Connexion en cours (°_°)")
+            print("Connection en cours (°_°)")
+            # Connection au serveur
             self.server_socket.connect((ip, port))
-            print("Connecté.")
-
-            # Création de compte
-            create_account_msg = self.server_socket.recv(1024).decode('utf-8')
-            print(create_account_msg)
-
-            # Envoyer le pseudo au serveur
-            pseudo = input("Entrez votre pseudo : ")
-            self.server_socket.send(bytes(pseudo, "utf-8"))
+            # Demande de pseudo au client
+            pseudo = input("Entrez votre pseudo: ")
             self.pseudo = pseudo
-            # Envoie du pseudo au serveur
-            self.server_socket.send(bytes(pseudo,"utf-8"))
-            print("Connectée.")
-        except Exception as e: # montre le message d'erreur pour la connexion au serveur (si il y en a)
-            print("Erreur la connexion au serveur a echouée : ", str(e))
+            # Envoi du pseudo au serveur
+            self.server_socket.send(bytes(pseudo, "utf-8"))
+            # Création du mot de passe au client
+            mot_de_passe = input("Entrez votre mot de passe: ")
+            # Envoi du mot de passe au serveur
+            self.server_socket.send(bytes(mot_de_passe, "utf-8"))
+            # Réception du message de bienvenue quand la connexion au serveur est réussie
+            message_bienvenue = self.server_socket.recv(4096).decode('utf-8')
+            print(message_bienvenue)
+            # Appel à la fonction création_compte
+            self.creation_compte()
+        except Exception as e:  # Montre le message d'erreur pour la connexion au serveur (s'il y en a)
+            print("Erreur la connexion au serveur a échoué : ", str(e))
+
+    def creation_compte(self):
+        """Permet à l'utilisateur de créer un compte"""
+        pseudo = input("Entrer le pseudo que vous souhaitez utiliser: ")
+        password = input("Entrer votre mot de passe: ")
+        confirmation_mot_de_passe = input("Confirmez votre mot de passe: ")
+        if password == confirmation_mot_de_passe:
+            self.server_socket.send(bytes(f"CREATEACCOUNT {pseudo}:{password}", "utf-8"))
+            reponse = self.server_socket.recv(4096).decode('utf-8').split("\n")[0]
+            if reponse == "OK":
+                print("Compte créé avec succès.")
+                self.login()
+            else:
+                print("Erreur lors de la création du compte.")
+        else:
+            print("Les mots de passe ne correspondent pas.")
 
     def envoie_mesg(self):
-        #Boucle pour envoyer des messages tant que le client et connectée  au serveur
+        # Boucle pour envoyer des messages tant que le client est connecté au serveur
         while self.running:
-            #création du message souhaitée
+            # Création du message souhaité
             msg = input(f"{self.pseudo}> ")
             self.msg = msg
-            #Envoi du message au serveur
+            # Envoi du message au serveur
             self.server_socket.send(f"{self.pseudo} > {msg}".encode("utf-8"))
-            # Si le message est exit, le client se déconnecte
+            # Si le message est "/exit", le client se déconnecte
             if msg == "/exit":
                 print("Déconnection en cours.....")
                 break
-            #if msg == "/new": # Si le message est new, une nouvelle discussion est créé.
-                # nouvelle_discussion = msg.split("", 1) # 
-                #self.server_socket.send(f"/new {nouvelle_discussion}".encode("utf-8"))
-                #print(f"VOus avez crée une nouvelle discussion'{nouvelle_discussion}'.")
-            #else: #
-                #self.server_socket.send(f"{self.pseudo}>{msg}".encode("utf-8"))
-                
-    def recevoir_msg (self):
-        #Boucle pour recevoir des messages tant que le client est connectée au serveur
+
+    def recevoir_msg(self):
+        # Boucle pour recevoir des messages tant que le client est connecté au serveur
         while True:
             try:
-                msg = self.server_socket.recv(1024).decode('utf-8')
-                if not msg:
-                    print("Erreur lors de la réception des messages.")
+                # Réception des données depuis le serveur
+                self.msg = self.server_socket.recv(1024).decode('utf-8')
+                # Vérification si les données ne sont pas vides
+                if not self.msg:
+                    print("Erreur")
                     self.running = False
                     break
                 else:
-                    print(msg)
+                    print(self.msg)
             except Exception as e:
                 print("Erreur :", str(e))
                 self.running = False
                 break
 
     def start_threads(self):
-        reception_thread = threading.Thread(target=self.receive_messages)
-        reception_thread.start()
+        # Création des threads pour gérer l'envoi et la réception de messages simultanée
+        reception_msg = threading.Thread(target=self.recevoir_msg)
+        envoyee_msg = threading.Thread(target=self.envoie_mesg)
+        # Démarrage des threads
+        reception_msg.start()
+        envoyee_msg.start()
 
-        while self.running:
-            message = input(f"{self.pseudo}> ")
-            if message.lower() == "/exit":
-                print("Déconnexion en cours...")
-                self.send_message("/exit")
-                self.running = False
-            else:
-                self.send_message(message)
-
-        reception_thread.join()
-
-# Utilisation du client
 client = Client()
 client.start_threads()
-#fd
-#
