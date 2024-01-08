@@ -11,7 +11,7 @@ clients = []
 pseudos = {}
 
 # Diffusion des messages privés
-def message(sender, receiver, message):
+def message(sender, receiver, message): 
     if receiver in pseudos:
         receiver_client = pseudos[receiver]
         sender.send(bytes(f"Message privé pour {receiver}: {message}", "utf-8"))
