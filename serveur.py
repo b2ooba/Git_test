@@ -1,48 +1,34 @@
 import socket
+import select
 import threading
-import sqlite3
 
-# Création d'un socket serveur TCP IPv4
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-IP, port = "127.0.0.1", 6666  # Adresse IP du serveur et le port d'écoute
-server.bind((IP, port))      # Associe le socket à l'adresse et au port spécifiés
-server.listen(10)              # Met le serveur en mode écoute pour jusqu'à 10 connexions entrantes
-
-# Connexion à la base de données SQLite
-conn = sqlite3.connect('chat_database.db')
-cursor = conn.cursor()
-
-# Création de la table si elle n'existe pas
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS clients (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        pseudo TEXT,
-        address TEXT,
-        port INTEGER
-    )
-''')
-conn.commit()
-
+IP, port = "127.0.0.1", 6666
+server.bind((IP, port))
+server.listen(10)
 clients = []
-pseudos = []
+pseudos = {}
 
-# Diffusion des messages 
-def diffuser(message):
+def diffuser(message, sender=None):
     for client in clients:
-        client.send(bytes(message, "utf-8"))
+        if client != sender:
+            client.send(bytes(message, "utf-8"))
 
-def ajouter_client_db(pseudo, address, port):
-    cursor.execute("INSERT INTO clients (pseudo, address, port) VALUES (?, ?, ?)", (pseudo, address, port))
-    conn.commit()
+def envoyer_message_prive(sender, receiver, message):
+    if receiver in pseudos:
+        receiver_client = pseudos[receiver]
+        sender.send(bytes(f"Message privé pour {receiver}: {message}", "utf-8"))
+        receiver_client.send(bytes(f"Message privé de {sender}: {message}", "utf-8"))
+    else:
+        sender.send(bytes(f"Erreur: {receiver} n'est pas connecté ou n'existe pas.", "utf-8"))
 
 def gestion_connexions():
     while True:
         client, adresse = server.accept()
-        print(f"Connexion établie avec {str(adresse)}")
+        print(f"connexion établie avec {str(adresse)}")
         pseudo = client.recv(1024).decode("utf-8")
-        ajouter_client_db(pseudo, adresse[0], adresse[1])
         clients.append(client)
-        pseudos.append(pseudo)
+        pseudos[pseudo] = client
         print(f"{pseudo} a rejoint le chat")
         client.send(bytes("Bienvenue dans le chat ! \n", "utf-8"))
         diffuser(f"{pseudo} a rejoint le chat!")
@@ -56,20 +42,25 @@ def gestion_client(client, pseudo):
             if message == "ecrit":
                 index = clients.index(client)
                 clients.remove(client)
+                pseudo = pseudos.pop(pseudo)
                 client.close()
-                pseudo = pseudos[index]
-                pseudos.remove(pseudo)
-                diffuser(f"{pseudo} a quitté le chat !")
+                diffuser(f"{pseudo} a quitté le chat!")
                 break
+            elif message.startswith("@"):
+                # Format du message privé : @destinataire message
+                parts = message.split(" ", 1)
+                if len(parts) == 2:
+                    envoyer_message_prive(pseudo, parts[0][1:], parts[1])
+                else:
+                    client.send(bytes("Format incorrect pour le message privé. Utilisez @destinataire message", "utf-8"))
             else:
-                diffuser(f"{pseudo}: {message}")
+                diffuser(f"{pseudo}: {message}", client)
         except:
             index = clients.index(client)
             clients.remove(client)
+            pseudo = pseudos.pop(pseudo)
             client.close()
-            pseudo = pseudos[index]
-            pseudos.remove(pseudo)
-            diffuser(f"{pseudo} a quitté le chat !")
+            diffuser(f"{pseudo} a quitté le chat!")
             break
 
 gestion_connexions()
