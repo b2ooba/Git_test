@@ -22,24 +22,33 @@ class Client:
             pseudo = input("Entrez votre pseudo : ")
             self.server_socket.send(bytes(pseudo, "utf-8"))
             self.pseudo = pseudo
+            # Envoie du pseudo au serveur
+            self.server_socket.send(bytes(pseudo,"utf-8"))
+            print("Connectée.")
+        except Exception as e: # montre le message d'erreur pour la connexion au serveur (si il y en a)
+            print("Erreur la connexion au serveur a echouée : ", str(e))
 
-            # Recevoir la demande de mot de passe
-            password_request_msg = self.server_socket.recv(1024).decode('utf-8')
-            print(password_request_msg)
-
-            # Envoyer le mot de passe au serveur
-            password = input("Entrez votre mot de passe : ")
-            self.server_socket.send(bytes(password, "utf-8"))
-
-            print("Création de compte réussie.")
-        except Exception as e:
-            print("Erreur: la connexion au serveur a échoué -", str(e))
-            self.running = False
-
-    def send_message(self, message):
-        self.server_socket.send(message.encode("utf-8"))
-
-    def receive_messages(self):
+    def envoie_mesg(self):
+        #Boucle pour envoyer des messages tant que le client et connectée  au serveur
+        while self.running:
+            #création du message souhaitée
+            msg = input(f"{self.pseudo}> ")
+            self.msg = msg
+            #Envoi du message au serveur
+            self.server_socket.send(f"{self.pseudo} > {msg}".encode("utf-8"))
+            # Si le message est exit, le client se déconnecte
+            if msg == "/exit":
+                print("Déconnection en cours.....")
+                break
+            #if msg == "/new": # Si le message est new, une nouvelle discussion est créé.
+                # nouvelle_discussion = msg.split("", 1) # 
+                #self.server_socket.send(f"/new {nouvelle_discussion}".encode("utf-8"))
+                #print(f"VOus avez crée une nouvelle discussion'{nouvelle_discussion}'.")
+            #else: #
+                #self.server_socket.send(f"{self.pseudo}>{msg}".encode("utf-8"))
+                
+    def recevoir_msg (self):
+        #Boucle pour recevoir des messages tant que le client est connectée au serveur
         while True:
             try:
                 msg = self.server_socket.recv(1024).decode('utf-8')
