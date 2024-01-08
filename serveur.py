@@ -1,5 +1,4 @@
 import socket  # Importe le module de gestion des sockets
-import select  # Importe le module Tkinter pour afficher des boîtes de dialogue
 import socket  # Importer le module de gestion des sockets
 import threading  # Importer le module threading pour les threade
 
