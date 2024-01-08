@@ -119,4 +119,4 @@ def handle_connections():
 
         # Page de création de compte
         client.send(bytes("Bienvenue ! Veuillez créer un compte.\nEntrez votre pseudo : ", "utf-8"))
-        pseudo = client.recv(1024).decode("
+        pseudo = client.recv(1024).decode("utf-8")
