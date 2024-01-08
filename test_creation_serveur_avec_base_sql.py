@@ -167,4 +167,8 @@ def gestion_connexions():
             client.close()
 
 # Lancer la gestion des connexions dans un thread séparé
+<<<<<<< HEAD
 threading.Thread(target=gestion_connexions).start()
+=======
+threading.Thread(target=gestion_connexions).start()
+>>>>>>> 869df20a6205eb3fff6615e7271e5cccd8788cbf
