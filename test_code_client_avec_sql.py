@@ -19,9 +19,49 @@ class Client:
             pseudo = input("Entrez votre pseudo: ")
             # Envoie du pseudo au serveur
             self.server_socket.send(bytes(pseudo, "utf-8"))
-            print("Connecté.")
+            
+            # Demande de mot de passe au client
+            mot_de_passe = input("Entrez votre mot de passe: ")
+            # Envoi du mot de passe au serveur
+            self.server_socket.send(bytes(mot_de_passe, "utf-8"))
+            
+            # Réception du message du serveur après la connexion
+            message_bienvenue = self.server_socket.recv(4096).decode('utf-8')
+            print(message_bienvenue)
+
         except Exception as e:
             print("Erreur la connexion au serveur a échoué : ", str(e))
+
+    def create_account(self):
+        while True:
+            # Demande de création de compte
+            create_account_input = input("Vous n'avez pas de compte. Voulez-vous créer un compte? (oui/non): ").lower()
+
+            if create_account_input == "oui":
+                # Création d'un compte
+                pseudo = input("Entrez un pseudo pour votre compte: ")
+                mot_de_passe = input("Entrez un mot de passe: ")
+                confirmation_mot_de_passe = input("Confirmez votre mot de passe: ")
+
+                # Vérification que les mots de passe correspondent
+                if mot_de_passe == confirmation_mot_de_passe:
+                    self.server_socket.send(bytes("create_account", "utf-8"))
+                    self.server_socket.send(bytes(f"{pseudo}:{mot_de_passe}", "utf-8"))
+                    response = self.server_socket.recv(4096).decode('utf-8')
+
+                    if response == "account_created":
+                        print("Compte créé avec succès.")
+                        break
+                    else:
+                        print("Erreur lors de la création du compte. Veuillez réessayer.")
+                else:
+                    print("Les mots de passe ne correspondent pas. Veuillez réessayer.")
+            elif create_account_input == "non":
+                print("Vous avez choisi de ne pas créer de compte. Déconnexion.")
+                self.running = False
+                break
+            else:
+                print("Réponse invalide. Veuillez répondre 'oui' ou 'non'.")
 
     def envoie_mesg(self):
         # Boucle pour envoyer des messages tant que le client est connecté au serveur
@@ -33,37 +73,4 @@ class Client:
             # Envoi du message au serveur avec le pseudo du destinataire
             self.server_socket.send(bytes(f"{destinataire}:{msg}", 'utf-8'))
 
-            # Si le message est '/exit', le client se déconnecte
-            if msg == "/exit":
-                print("Déconnexion en cours.....")
-                break
-
-    def recevoir_msg(self):
-        # Boucle pour recevoir des messages tant que le client est connecté au serveur
-        while True:
-            try:
-                # Réception des données depuis le serveur
-                data = self.server_socket.recv(4096).decode('utf-8')
-                # Vérification si les données ne sont pas vides
-                if not data:
-                    print("Erreur")
-                    self.running = False
-                    break
-                else:
-                    print(data)
-            except Exception as e:
-                print("Erreur :", str(e))
-                self.running = False
-                break
-
-    def start_threads(self):
-        # Création des threads pour gérer l'envoi et la réception de messages simultanée
-        reception_msg = threading.Thread(target=self.recevoir_msg)
-        envoyee_msg = threading.Thread(target=self.envoie_mesg)
-        # Démarrée les threads
-        reception_msg.start()
-        envoyee_msg.start()
-
-# Instanciation du client et démarrage des threads
-client = Client()
-client.start_threads()
+            # Si le message est '/exit
