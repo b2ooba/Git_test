@@ -29,7 +29,7 @@ class Client:
             # Création du message souhaité
             destinataire = input("Entrez le pseudo du destinataire (ou 'tous' pour envoyer à tous): ")
             msg = input("Entrez votre message: ")
-
+        
             # Envoi du message au serveur avec le pseudo du destinataire
             self.server_socket.send(bytes(f"{destinataire}:{msg}", 'utf-8'))
 
@@ -58,11 +58,11 @@ class Client:
 
     def start_threads(self):
         # Création des threads pour gérer l'envoi et la réception de messages simultanée
-        envoyee_msg = threading.Thread(target=self.envoie_mesg)
         reception_msg = threading.Thread(target=self.recevoir_msg)
+        envoyee_msg = threading.Thread(target=self.envoie_mesg)
         # Démarrée les threads
-        envoyee_msg.start()
         reception_msg.start()
+        envoyee_msg.start()
 
 # Instanciation du client et démarrage des threads
 client = Client()
