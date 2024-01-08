@@ -56,9 +56,10 @@ def client_handler(client, pseudo):
 conn = sqlite3.connect('chat_database.db')
 cursor = conn.cursor()
 
-# Création de la table 'utilisateurs' pour stocker les informations d'authentification
+
+# Création de la table 'clients'
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS utilisateurs (
+    CREATE TABLE IF NOT EXISTS clients (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         pseudo TEXT UNIQUE,
         mdp TEXT
@@ -77,15 +78,7 @@ cursor.execute('''
 ''')
 conn.commit()
 
-# Création de la table 'clients'
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS clients (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        pseudo TEXT UNIQUE,
-        mdp TEXT
-    )
-''')
-conn.commit()
+
 
 # Fonction pour ajouter un client à la base de données
 def add_client_to_db(pseudo, mdp, address, port):
@@ -120,3 +113,43 @@ def handle_connections():
         # Page de création de compte
         client.send(bytes("Bienvenue ! Veuillez créer un compte.\nEntrez votre pseudo : ", "utf-8"))
         pseudo = client.recv(1024).decode("utf-8")
+        # Ajout du client à la liste
+        clients.append(client)
+        pseudos[pseudo] = client
+
+        # Fonction de création de compte
+        create_account(client, pseudo)
+
+def create_account(client, pseudo):
+    local_conn = sqlite3.connect('chat_database.db')
+    local_cursor = local_conn.cursor()
+
+    local_cursor.execute("SELECT * FROM utilisateurs WHERE pseudo=?", (pseudo,))
+    user_exists = local_cursor.fetchone() is not None
+
+    if user_exists:
+        client.send(bytes("Ce pseudo est déjà pris. Veuillez choisir un autre pseudo.", "utf-8"))
+        client.close()
+    else:
+        client.send(bytes("Entrez votre mot de passe : ", "utf-8"))
+        mdp = client.recv(1024).decode("utf-8")
+        # Enregistrement des informations dans la base de données
+        local_cursor.execute("INSERT INTO utilisateurs (pseudo, mdp) VALUES (?, ?)", (pseudo, mdp))
+        local_conn.commit()
+
+        # Appel à la fonction d'authentification
+        authenticate(client, pseudo, mdp)
+
+def authenticate(client, pseudo, mdp):
+    local_conn = sqlite3.connect('chat_database.db')
+    local_cursor = local_conn.cursor()
+
+    if verify_authentication(pseudo, mdp):
+        client.send(bytes(f"Bienvenue dans le chat, {pseudo}!\n", "utf-8"))
+        threading.Thread(target=client_handler, args=(client, pseudo)).start()
+    else:
+        client.send(bytes("Erreur d'authentification. Fermeture de la connexion.", "utf-8"))
+        client.close()
+
+# Lancer la gestion des connexions dans un thread séparé
+threading.Thread(target=handle_connections).start()

@@ -6,11 +6,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('login_page.html')
 
 @app.route('/create_account')
 def create_account():
-    return render_template('create_account.html')
+    return render_template('sigup.page.html')
 
 class Client:
     def __init__(self, server_ip="127.0.0.1", port=6666):
