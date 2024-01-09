@@ -11,35 +11,6 @@ users = {}  # Structure: {username: password_hash}
 friends = {}  # Structure: {username: [list_of_friend_usernames]}
 conversations = {}  # Structure: {(user1_username, user2_username): [messages]}
 
-# Ajout d'un namespace authentifié
-class AuthenticatedNamespace(Namespace):
-    def on_connect(self):
-        username = request.args.get('username')
-        if not username or not self.is_authenticated(username):
-            disconnect()
-            return
-        join_room(username)
-        emit('status', {'message': f'{username} has entered the room.'}, room=username)
-        self.update_connected_users()
-
-    def on_disconnect(self):
-        username = request.args.get('username')
-        leave_room(username)
-        emit('status', {'message': f'{username} has left the room.'}, room=username)
-        self.update_connected_users()
-
-    @staticmethod
-    def is_authenticated(username):
-        # Ajoutez votre logique d'authentification ici
-        return username in users
-
-    def update_connected_users(self):
-        connected_users = {sid: (socketio.server.rooms[sid], sid) for sid in socketio.server.rooms}
-        emit('connected_users', {'users': connected_users})
-
-# Utilisez le nouveau namespace dans votre application SocketIO
-socketio = SocketIO(app, namespace='/chat', cls=AuthenticatedNamespace)
-
 @app.route('/')
 def index():
     # Supposons que l'utilisateur soit déjà authentifié pour cet exemple
@@ -47,7 +18,7 @@ def index():
     if not username:
         return redirect(url_for('login'))
     user_friends = friends.get(username, [])
-    user_conversations = {friend: conversations.get((min(username, friend), max(username, friend)), []) for friend in user_friends}
+    user_conversations = {friend: conversations.get((min(username, friend),max(username, friend)), []) for friend in user_friends}
     return render_template('index.html', conversations=user_conversations)
 
 
@@ -102,6 +73,7 @@ def handle_send_message(json):
 
     # Envoi en temps réel au destinataire si il est connecté
     emit('receive_message', json, room=receiver)
+
 
 # Démarre l'application
 if __name__ == '__main__':
