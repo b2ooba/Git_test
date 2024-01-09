@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Application de Messagerie</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            
+            <!-- Barre de menu verticale -->
+            <div class="menu">
+                <a href="#contacts"><img src="profil.png" alt="Profil"></a>
+                <a href="#groupes"><img src="write.png" alt="Ouvrir Popup" id="openPopupImage" style="cursor: pointer;"></a>
+                <div id="popup" style="display:none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid black;">
+                    <p>Liste des contact</p>
+                    <button onclick="closePopup()">Fermer</button>
+                </div>
+            </div>
+            
+            <!-- Barre de recherche -->
+            <div class="search-bar">
+                <input type="text" placeholder="Rechercher..."/>
+                <button class="bouton">Rechercher</button>
+            </div>
+
+            <!-- Liste des contacts -->
+            <div class="chat-list">
+                <div class="chat-list-item"> 
+                    <img src="avatar.png" class="profil" alt="Avatar">
+                    <div class="text-content">
+                        <div class="name"><a href="#conversation1" class="contact">Salim</a></div>
+                        <div class="last-message">Dernier message...</div>
+                        <div class="time">13:45</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <script src="java.js"></script>
+</body>
+</html>

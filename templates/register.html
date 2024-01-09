@@ -1,0 +1,17 @@
+<!-- templates/register.html -->
+
+{% extends 'index.html' %}
+
+{% block content %}
+  <h2>Inscription</h2>
+  <form action="{{ url_for('register') }}" method="post">
+    <label for="username">Nom d'utilisateur:</label>
+    <input type="text" id="username" name="username" required>
+    <label for="password">Mot de passe:</label>
+    <input type="password" id="password" name="password" required>
+    <label for="confirm_password">Confirmez le mot de passe:</label>
+    <input type="password" id="confirm_password" name="confirm_password" required>
+    <button type="submit">S'inscrire</button>
+  </form>
+  <a href="{{ url_for('login') }}">Se connecter</a>
+{% endblock %}
