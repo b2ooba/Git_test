@@ -77,9 +77,6 @@ if __name__ == "__main__":
 """
 import threading
 import socket
-from flask import Flask, render_template
-
-app = Flask(__name__)
 
 class Client:
     def __init__(self, server_ip="127.0.0.1", port=6666):
@@ -97,6 +94,7 @@ class Client:
             self.handle_welcome_message()
         except Exception as e:
             print(f"Erreur la connexion au serveur a échoué : {str(e)}")
+            self.running = False  # Ajout pour arrêter les threads en cas d'échec de la connexion
 
     def handle_welcome_message(self):
         message = self.server_socket.recv(4096).decode('utf-8')
@@ -129,11 +127,15 @@ class Client:
 
     def send_msg(self):
         while self.running:
-            msg = input(f"{self.pseudo}> ")
-            self.msg = msg
-            self.server_socket.send(f"{self.pseudo} > {msg}".encode("utf-8"))
-            if msg == "/exit":
-                print("Déconnection en cours.....")
+            try:
+                msg = input(f"{self.pseudo}> ")
+                self.server_socket.send(f"{self.pseudo} > {msg}".encode("utf-8"))
+                if msg == "/exit":
+                    print("Déconnexion en cours.....")
+                    break
+            except Exception as e:
+                print("Erreur :", str(e))
+                self.running = False
                 break
 
     def receive_msg(self):
@@ -151,15 +153,6 @@ class Client:
                 self.running = False
                 break
 
-@app.route('/')
-def index():
-    return render_template('login_page.html')
-
-@app.route('/signup')
-def signup():
-    return render_template('signup_page.html')
-
 if __name__ == "__main__":
     client = Client()
     client.start_threads()
-    app.run(debug=True)
