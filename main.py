@@ -6,10 +6,12 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
+
 # Structure pour stocker les informations basiques
 users = {}  # Structure: {username: password_hash}
 friends = {}  # Structure: {username: [list_of_friend_usernames]}
 conversations = {}  # Structure: {(user1_username, user2_username): [messages]}
+
 
 @app.route('/')
 def index():
