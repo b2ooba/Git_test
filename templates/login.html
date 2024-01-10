@@ -1,0 +1,13 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="signup-container">
+    <h2>Connexion</h2>
+    <form action="{{ url_for('login') }}" method="post">
+        <input type="text" id="username" name="username" placeholder="Nom d'utilisateur" required>
+        <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+        <button type="submit" class="signup-button">Se connecter</button>
+    </form>
+    <a href="{{ url_for('register') }}">Créer un compte</a>
+</div>
+{% endblock %}
