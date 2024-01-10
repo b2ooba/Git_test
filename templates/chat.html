@@ -5,71 +5,209 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
     <style>
+        /* Styles de base pour la démonstration */
         body {
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .chat-box {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 20px;
-            overflow-y: auto;
-            max-height: 400px;
-            padding: 10px;
-            background-color: #fff;
-        }
-
-        .message {
-            margin-bottom: 10px;
-        }
-
-        .message .sender {
-            font-weight: bold;
-            color: #007bff;
-        }
-
-        .message .content {
-            margin-left: 10px;
-        }
-
-        .input-box {
-            margin-top: 10px;
             display: flex;
         }
-
-        .input-box input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            margin-right: 5px;
+        .sidebar {
+            width: 550px;
+            background-color: #fff;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
         }
-
-        .input-box button {
-            padding: 8px;
+        .menu {
+            display: flex; /* Utilisez flexbox pour aligner les éléments horizontalement */
+            justify-content: space-around; /* Répartit les éléments uniformément */
+            padding: 10px;
+            border-bottom: 1px solid #ddd; /* Ajoute une bordure en bas du menu */
+        }
+        
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            padding: 5px 10px; 
+        }
+        
+        .menu a:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .chat-list {
+            flex-grow: 1;
+            padding: 10px;
+        }
+        .chat-list-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-list-item:hover {
+            background-color: #f9f9f9;
+        }
+        .top-bar {
+            width: calc(100% - 350px);
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .search-bar {
+            padding: 10px;
+            background-color: #fff;
+            display: flex; /* Use flexbox for horizontal alignment */
+            justify-content: space-between; /* This will ensure that the input and button are spaced out */
+            align-items: center;
+            border-bottom: 1px solid #ddd; /* Optional: if you want a border under the search bar */
+        }
+        
+        .search-bar input[type="text"] {
+            flex-grow: 1; /* This will make the input grow to fill available space */
+            padding: 5px;
+            margin-right: 10px; /* You can adjust or remove the margin as needed */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .search-bar button {
+            padding: 5px 10px;
+            background-color: #07b50a;
+            color: white;
             border: none;
-            border-radius: 3px;
-            background-color: #007bff;
-            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap; /* Prevents text wrapping in button */
+        }
+        
+        .search-bar button {
+            padding: 5px 10px;
+            background-color:#07b50a;
+            color: white;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
         }
+        .search-bar button:hover {
+            background-color: #07b50a;
+        }
+        
+        .chat-list-item {
+            display: flex;
+            align-items: center; /* Centre verticalement */
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .profil {
+            width: 40px; /* Ajustez selon la taille souhaitée */
+            height: 40px; /* Ajustez selon la taille souhaitée */
+            margin-right: 10px; /* Espace entre l'image et le texte */
+            border-radius: 50%; /* Rend l'image circulaire */
+        }
+        
+        
+        .main-content {
+            flex-grow: 1;
+            padding: 10px;
+            display: flex; /* Utilisation de flexbox */
+            flex-direction: column; /* Empilement vertical des éléments */
+            justify-content: space-between; /* Répartit l'espace entre les éléments */
+        }
+        
+        .chat-window {
+            background-color: #fff;
+            flex-grow: 1; /* Permet à la fenêtre de chat de remplir l'espace disponible */
+            margin-bottom: 10px; /* Marge en bas */
+            padding-right: 200px;
+            overflow-y: auto;
+        }
+        
+        .message-input {
+            display: flex;
+            padding: 10px;
+            background-color: #f4f4f4; /* Couleur de fond pour la zone grise */
+            border-top: 1px solid #ddd;
+            justify-content: flex-end; /* Alignement des éléments à droite */
+        }
+        
+        .message-input input[type="text"] {
+            flex-grow: 1;
+            margin-right: 10px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .message-input button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .chat-area {
+            max-width: 600px; /* Largeur maximale de la zone de chat */
+            margin-left: auto; /* Pousse la zone de chat vers la droite */
+            margin-right: 20px; /* Espace à droite de la zone de chat */
+        }
+
+
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="chat-box" id="chat-box"></div>
+        <div class="sidebar">
+            <!-- Barre de menu verticale -->
+            <div class="menu">
+                <a href="#contacts"><img src="profil.png" alt="Profil"></a>
+                <a href="#groupes"><img src="write.png" alt="Ouvrir Popup" id="openPopupImage" style="cursor: pointer;"></a>
+                <div id="popup" style="display:none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid black;">
+                    <p>Liste des contact</p>
+                    <button onclick="closePopup()">Fermer</button>
+                </div>
+            </div>
+
+            <!-- Barre de recherche -->
+            <div class="search-bar">
+                <input type="text" placeholder="Rechercher..."/>
+                <button class="bouton">Rechercher</button>
+            </div>
+
+            <!-- Liste des contacts -->
+            <div class="chat-list">
+                <div class="chat-list-item"> 
+                <img src="avatar.png" class="profil" alt="Avatar">
+                <div class="text-content">
+                <div class="name"><a href="#conversation1" class="contact">Salim</a></div>
+                <div class="last-message">Dernier message...</div>
+                <div class="time">13:45</div>
+                </div>
+             </div>
+    </div>
+
+    <div class="chat-area">
+        <div class="chat-box" id="chat-box">
+            <!-- Messages du chat ici -->
+        </div>
         <div class="input-box">
             <input type="text" id="message-input" placeholder="Type your message...">
             <button onclick="sendMessage()">Send</button>
         </div>
+    </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
@@ -125,3 +263,5 @@
     </script>
 </body>
 </html>
+
+
