@@ -2,6 +2,8 @@ from flask import Flask, render_template, session, request, url_for, redirect
 from flask_socketio import SocketIO, emit, join_room
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import jsonify
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -88,6 +90,19 @@ def register():
         else:
             return "Nom d'utilisateur déjà pris", 409
     return render_template('register.html')
+
+
+@app.route('/get_users', methods=['GET'])
+def get_users():
+    # Récupérez tous les utilisateurs de la base de données
+    users = User.query.all()
+    
+    # Construisez une liste des noms d'utilisateur
+    user_list = [user.username for user in users]
+
+    # Retournez la liste des utilisateurs sous forme de réponse JSON
+    return jsonify(users=user_list)
+
 
 # SocketIO events
 @socketio.on('send_message')
