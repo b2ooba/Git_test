@@ -98,7 +98,6 @@ def handle_send_message(json):
         (Conversation.user1_id == session.get('user_id'), Conversation.user2_id == receiver) |
         (Conversation.user1_id == receiver, Conversation.user2_id == session.get('user_id'))
     ).first()
-
     if not conversation:
         conversation = Conversation(user1_id=session.get('user_id'), user2_id=receiver)
         db.session.add(conversation)
