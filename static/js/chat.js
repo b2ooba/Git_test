@@ -20,6 +20,55 @@ function sendMessage() {
     }
 }
 
+// chat.js
+
+document.addEventListener('DOMContentLoaded', function () {
+    // ... Autres initialisations ...
+
+    // Gestionnaire d'événements pour le bouton "Groupes"
+    const groupButton = document.querySelector('#openPopupImage');
+    groupButton.addEventListener('click', function () {
+        // Envoyez une requête au serveur pour obtenir la liste des utilisateurs
+        fetch('/get_users')
+            .then(response => response.json())
+            .then(data => {
+                // Manipulez la réponse du serveur (liste des utilisateurs)
+                console.log(data.users);
+                // Vous pouvez maintenant utiliser la liste des utilisateurs pour afficher ou effectuer d'autres actions
+            })
+            .catch(error => console.error('Erreur lors de la récupération des utilisateurs:', error));
+    });
+
+    // ... Autres gestionnaires d'événements ...
+});
+
+// Bouton pop
+function openUserModal() {
+    document.getElementById('popup').style.display = 'block';
+    fetchUsers();
+}
+
+function closeUserModal() {
+    document.getElementById('popup').style.display = 'none';
+}
+
+function fetchUsers() {
+    fetch('/get_users')
+        .then(response => response.json())
+        .then(data => {
+            const userList = document.getElementById('user-list');
+            userList.innerHTML = '';
+
+            data.users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.textContent = user;
+                userList.appendChild(userElement);
+            });
+        })
+        .catch(error => console.error('Error fetching users:', error));
+}
+
+
 // Function to display received messages
 function displayMessage(sender, content) {
     var chatBox = document.getElementById('chat-box');
@@ -46,4 +95,3 @@ function displayMessage(sender, content) {
 socket.on('receive_message', function(json) {
     displayMessage(json.sender, json.message);
 });
-</script>
