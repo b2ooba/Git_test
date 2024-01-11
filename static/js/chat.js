@@ -20,6 +20,7 @@ function sendMessage() {
     }
 }
 
+
 // Function to display received messages
 function displayMessage(sender, content) {
     var chatBox = document.getElementById('chat-box');
@@ -46,4 +47,3 @@ function displayMessage(sender, content) {
 socket.on('receive_message', function(json) {
     displayMessage(json.sender, json.message);
 });
-</script>

@@ -50,6 +50,7 @@ def chat():
     # Logique de la vue chat
     return render_template('chat.html')  # Assurez-vous d'avoir le bon chemin pour votre template
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -64,6 +65,8 @@ def login():
         else:
             return "Nom d'utilisateur ou mot de passe incorrect!", 401
     return render_template('login.html')
+
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
