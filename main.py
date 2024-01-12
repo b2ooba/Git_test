@@ -68,6 +68,57 @@ def login():
             return "Nom d'utilisateur ou mot de passe incorrect!", 401
     return render_template('login.html')
 
+"""Ajout fonction ajout d'amis """
+@app.route('/add_friend', methods=['POST'])
+def add_friend():
+    if request.method == 'POST':
+        username = session.get('username')
+        friend_username = request.form['friend_username']
+
+        # Vérifiez si l'utilisateur existe
+        user = User.query.filter_by(username=username).first()
+        friend = User.query.filter_by(username=friend_username).first()
+
+        if not user or not friend:
+            return jsonify({'success': False, 'message': 'Utilisateur introuvable'}), 400
+
+        # Vérifiez si les utilisateurs ne sont pas déjà amis
+        existing_friendship = Friend.query.filter_by(user_id=user.id, friend_username=friend_username).first()
+
+        if existing_friendship:
+            return jsonify({'success': False, 'message': 'Utilisateurs déjà amis'}), 400
+
+        # Ajoutez les utilisateurs comme amis
+        new_friendship = Friend(user_id=user.id, friend_username=friend_username)
+        db.session.add(new_friendship)
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Ami ajouté avec succès'}), 200
+
+# ...
+"""FIN FONCTION"""
+
+"""AJOUT FONCTION VOIR LISTE AMIS"""
+# ...
+
+@app.route('/view_friends')
+def view_friends():
+    username = session.get('username')
+
+    if not username:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return redirect(url_for('login'))
+
+    user_friends = Friend.query.filter_by(user_id=user.id).all()
+    friend_usernames = [friend.friend_username for friend in user_friends]
+
+    return render_template('view_friends.html', friend_usernames=friend_usernames)
+
+"""FIN FONCTION LISTE AMIS"""
 
 
 @app.route('/register', methods=['GET', 'POST'])

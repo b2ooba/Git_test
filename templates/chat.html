@@ -19,11 +19,25 @@
                     <a href="#contacts">
                         <img src="{{ url_for('static', filename='images/profil.png') }}" alt="Profil">
                     </a>
+                    <!--AJOUT BOUTON AJOUT d'AMIS-->
+                    <a href="javascript:void(0);" onclick="addFriend()">Ajouter un ami</a>
+                    <!--FIN BOUTON AJOUT d'AMIS-->
+                    <!--AJOUT FONCTION LISTE AMIS-->
+                    <!-- chat.html -->
+
+                    <!-- ... Votre code HTML existant ... -->
+                    <div class="menu">
+                    <!-- ... Autres liens ... -->
+                    <a href="{{ url_for('view_friends') }}">Voir mes amis</a>
+                    </div>
+                    <!-- ... Votre code HTML existant ... -->
+                    <!--FIN LISTE AMIS-->
                     <a href="#groupes">
                         <img src="{{ url_for('static', filename='images/write.png') }}" alt="Ouvrir Popup" id="openPopupImage" style="cursor: pointer;">
                     </a>
-                    <div id="popup" style="display:none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid black;">
+                    <div id="popup" style="display:none; position: fixed; left: 27%; top: 10%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid black;">
                         <p>Liste des contacts</p>
+                        <div id="user-list"></div>
                         <button onclick="closePopup()">Fermer</button>
                     </div>
                 </div>

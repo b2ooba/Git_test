@@ -42,31 +42,68 @@ document.addEventListener('DOMContentLoaded', function () {
     // ... Autres gestionnaires d'événements ...
 });
 
-// Bouton pop
-function openUserModal() {
-    document.getElementById('popup').style.display = 'block';
-    fetchUsers();
-}
-
-function closeUserModal() {
-    document.getElementById('popup').style.display = 'none';
-}
-
-function fetchUsers() {
+// Gestionnaire d'événements pour le bouton "Groupes"
+const groupButton = document.querySelector('#openPopupImage');
+groupButton.addEventListener('click', function () {
+    // Envoyez une requête au serveur pour obtenir la liste des utilisateurs
     fetch('/get_users')
         .then(response => response.json())
         .then(data => {
-            const userList = document.getElementById('user-list');
-            userList.innerHTML = '';
+            // Manipulez la réponse du serveur (liste des utilisateurs)
+            console.log(data.users);
 
-            data.users.forEach(user => {
-                const userElement = document.createElement('div');
-                userElement.textContent = user;
-                userList.appendChild(userElement);
-            });
+            // Affichez la liste des utilisateurs dans le popup
+            openPopup(data.users);
         })
-        .catch(error => console.error('Error fetching users:', error));
+        .catch(error => console.error('Erreur lors de la récupération des utilisateurs:', error));
+});
+
+// Fonction pour ouvrir le popup et afficher la liste des utilisateurs
+function openPopup(userList) {
+    const popup = document.getElementById('popup');
+    const userListElement = document.getElementById('user-list');
+
+    // Effacez le contenu existant du popup
+    userListElement.innerHTML = '';
+
+    // Ajoutez chaque utilisateur à la liste du popup
+    userList.forEach(user => {
+        const userElement = document.createElement('div');
+        userElement.textContent = user;
+        userListElement.appendChild(userElement);
+    });
+
+    // Affichez le popup
+    popup.style.display = 'block';
 }
+
+// Fonction pour fermer le popup
+function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+}
+
+// AJOUT FONCTION AJOUT D'AMIS
+// Fonction pour envoyer une demande d'ajout d'amis
+function addFriend() {
+    var friendInput = prompt("Entrez le nom d'utilisateur de votre ami:");
+
+    if (friendInput) {
+        fetch('/add_friend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'friend_username=' + friendInput,
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => console.error('Erreur lors de l\'ajout d\'ami:', error));
+    }
+}
+
+//FIN FONCTION AJOUT d'AMI
 
 
 // Function to display received messages

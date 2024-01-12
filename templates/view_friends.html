@@ -1,0 +1,19 @@
+<!-- view_friends.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste d'amis</title>
+</head>
+<body>
+    <h1>Liste d'amis</h1>
+    <ul>
+        {% for friend_username in friend_usernames %}
+            <li>{{ friend_username }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('chat') }}">Retour à l'accueil</a>
+</body>
+</html>
