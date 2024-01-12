@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Chat</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chat.css') }}">
+    </head>
+</head>
+<body>
+    <div class="container">
+        <!-- ... Votre code HTML existant ... -->
+        <div class="container">
+            <div class="sidebar">
+                <!-- Barre de menu verticale -->
+                <div class="menu">
+                    <a href="#contacts">
+                        <img src="{{ url_for('static', filename='images/profil.png') }}" alt="Profil">
+                    </a>
+                    <!--AJOUT BOUTON AJOUT d'AMIS-->
+                    <a href="javascript:void(0);" onclick="addFriend()">Ajouter un ami</a>
+                    <!--FIN BOUTON AJOUT d'AMIS-->
+                    <!--AJOUT FONCTION LISTE AMIS-->
+                    <!-- chat.html -->
+
+                    <!-- ... Votre code HTML existant ... -->
+                    <div class="menu">
+                    <!-- ... Autres liens ... -->
+                    <a href="{{ url_for('view_friends') }}">Voir mes amis</a>
+                    </div>
+                    <!-- ... Votre code HTML existant ... -->
+                    <!--FIN LISTE AMIS-->
+                    <a href="#groupes">
+                        <img src="{{ url_for('static', filename='images/write.png') }}" alt="Ouvrir Popup" id="openPopupImage" style="cursor: pointer;">
+                    </a>
+                    <div id="popup" style="display:none; position: fixed; left: 27%; top: 10%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid black;">
+                        <p>Liste des contacts</p>
+                        <div id="user-list"></div>
+                        <button onclick="closePopup()">Fermer</button>
+                    </div>
+                </div>
+                <!-- Ajoutez ceci dans votre HTML -->
+                <div id="user-list"></div>
+
+                <!-- Barre de recherche -->
+                <div class="search-bar">
+                    <input type="text" placeholder="Rechercher..."/>
+                    <button class="bouton">Rechercher</button>
+                </div>
+                <!-- Liste des contacts -->
+                <div class="chat-list">
+                    <div class="chat-list-item"> 
+                    <img src="avatar.png" class="profil" alt="Avatar">
+                    <div class="text-content">
+                    <div class="name"><a href="#conversation1" class="contact">Salim</a></div>
+                    <div class="last-message">Dernier message...</div>
+                    <div class="time">13:45</div>
+                    </div>
+                 </div>
+        </div>
+        <div class="chat-area">
+            <div class="chat-box" id="chat-box">
+        <div class="chat-area">
+            <div class="chat-box" id="chat-box">
+                <!-- Messages du chat ici -->
+            </div>
+            <div class="input-box">
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    </body>
+</body>
+</html>
