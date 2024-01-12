@@ -19,6 +19,19 @@
                     <a href="#contacts">
                         <img src="{{ url_for('static', filename='images/profil.png') }}" alt="Profil">
                     </a>
+                    <!--AJOUT BOUTON AJOUT d'AMIS-->
+                    <a href="javascript:void(0);" onclick="addFriend()">Ajouter un ami</a>
+                    <!--FIN BOUTON AJOUT d'AMIS-->
+                    <!--AJOUT FONCTION LISTE AMIS-->
+                    <!-- chat.html -->
+
+                    <!-- ... Votre code HTML existant ... -->
+                    <div class="menu">
+                    <!-- ... Autres liens ... -->
+                    <a href="{{ url_for('view_friends') }}">Voir mes amis</a>
+                    </div>
+                    <!-- ... Votre code HTML existant ... -->
+                    <!--FIN LISTE AMIS-->
                     <a href="#groupes">
                         <img src="{{ url_for('static', filename='images/write.png') }}" alt="Ouvrir Popup" id="openPopupImage" style="cursor: pointer;">
                     </a>

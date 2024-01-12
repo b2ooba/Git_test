@@ -82,6 +82,29 @@ function closePopup() {
     document.getElementById('popup').style.display = 'none';
 }
 
+// AJOUT FONCTION AJOUT D'AMIS
+// Fonction pour envoyer une demande d'ajout d'amis
+function addFriend() {
+    var friendInput = prompt("Entrez le nom d'utilisateur de votre ami:");
+
+    if (friendInput) {
+        fetch('/add_friend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'friend_username=' + friendInput,
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => console.error('Erreur lors de l\'ajout d\'ami:', error));
+    }
+}
+
+//FIN FONCTION AJOUT d'AMI
+
 
 // Function to display received messages
 function displayMessage(sender, content) {
