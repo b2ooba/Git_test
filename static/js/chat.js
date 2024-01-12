@@ -103,8 +103,25 @@ function addFriend() {
     }
 }
 
-//FIN FONCTION AJOUT d'AMI
+//DEBUT FIN FONCTION AJOUT d'AMI
 
+//AJOUT FONCTION LISTE D'AMIS
+// Fonction pour afficher la liste d'amis dans un pop-up
+function viewFriends() {
+    fetch('/view_friends')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const friendList = data.friend_usernames.join('\n');
+                alert('Liste d\'amis:\n\n' + friendList);
+            } else {
+                alert('Erreur: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Erreur lors de la récupération de la liste d\'amis:', error));
+}
+
+//FIN AJOUT FONCTION LISTE D'AMIS
 
 // Function to display received messages
 function displayMessage(sender, content) {

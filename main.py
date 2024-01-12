@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
 from sqlalchemy import or_, and_
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Base.sql'
@@ -21,6 +22,7 @@ class Friend(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     friend_username = db.Column(db.String(20), nullable=False)
+
 
 class Conversation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -98,6 +100,7 @@ def add_friend():
 
         return jsonify({'success': True, 'message': 'Ami ajouté avec succès'}), 200
 
+"""DEBUT FONCTION LISTE AMIS"""
 @app.route('/view_friends')
 def view_friends():
     username = session.get('username')
@@ -113,8 +116,9 @@ def view_friends():
     user_friends = Friend.query.filter_by(user_id=user.id).all()
     friend_usernames = [friend.friend_username for friend in user_friends]
 
-    return render_template('view_friends.html', friend_usernames=friend_usernames)
+    return jsonify({'success': True, 'friend_usernames': friend_usernames})
 
+"""FIN FONCTION LISTE AMIS"""
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
