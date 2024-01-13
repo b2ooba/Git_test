@@ -6,5 +6,7 @@ h
 ddd
 fe
 new
+<<<<<<< HEAD
+jgg
+=======
 hfrio
-Coucou
