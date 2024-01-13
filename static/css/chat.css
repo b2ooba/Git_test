@@ -124,4 +124,13 @@ body {
     overflow-y: auto;
 }
 
+/* Ajoutez ces styles dans votre fichier CSS existant */
 
+.connecte {
+    background-color: #07b50a;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}

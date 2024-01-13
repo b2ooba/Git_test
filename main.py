@@ -11,6 +11,8 @@ app.config['SECRET_KEY'] = 'secret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Base.sql'
 db = SQLAlchemy(app)
 socketio = SocketIO(app)
+conversations = {}
+
 
 # Models
 class User(db.Model):
@@ -159,25 +161,17 @@ def get_users():
 
     return jsonify(users=user_list)
 
+# SocketIO event for receiving messages
 @socketio.on('send_message')
 def handle_send_message(json):
-    sender = json['sender']
-    receiver = json['receiver']
-    message = json['message']
+    # Ajout message dans 'conversations'
+    convo_key = (min(json['sender'], json['receiver']), max(json['sender'], json['receiver']))
+    if convo_key not in conversations:
+        conversations[convo_key] = []
+    conversations[convo_key].append({"sender": json['sender'], "message": json['message']})
 
-    conversation = Conversation.query.filter(
-        (Conversation.user1_id == session.get('user_id'), Conversation.user2_id == receiver) |
-        (Conversation.user1_id == receiver, Conversation.user2_id == session.get('user_id'))
-    ).first()
-    if not conversation:
-        conversation = Conversation(user1_id=session.get('user_id'), user2_id=receiver)
-        db.session.add(conversation)
-        db.session.commit()
-
-    db.session.add(Message(conversation_id=conversation.id, sender_id=session.get('user_id'), message=message))
-    db.session.commit()
-
-    emit('receive_message', json, room=receiver)
+    # Broadcast du message à tous les utilisateurs connectés
+    emit('receive_message', json, broadcast=True)
 
 if __name__ == '__main__':
     with app.app_context():

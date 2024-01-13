@@ -1,25 +1,3 @@
-var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-// Function to send a message
-function sendMessage() {
-    var messageInput = document.getElementById('message-input');
-    var message = messageInput.value.trim();
-
-    if (message !== "") {
-        // Utiliser la variable de session 'username' pour définir le destinataire
-        var receiver = "{{ receiver_username }}";  // Mettez ici la logique pour choisir le destinataire
-
-        var json = {
-            'sender': "{{ session['username'] }}",
-            'receiver': receiver,
-            'message': message
-        };
-
-        socket.emit('send_message', json);
-        messageInput.value = "";
-    }
-}
-
 // chat.js
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -123,7 +101,44 @@ function viewFriends() {
 
 //FIN AJOUT FONCTION LISTE D'AMIS
 
-// Function to display received messages
+
+var socket = io.connect('http://' + document.domain + ':' + location.port);
+// Fonction pour envoyer un message
+function sendMessage() {
+    var messageInput = document.getElementById('message-input');
+    var message = messageInput.value.trim();
+
+    if (message !== "") {
+        // Utilisez la variable de session 'username' pour définir le destinataire
+        var receiver = "{{ receiver_username }}";  // Mettez ici la logique pour choisir le destinataire
+
+        var json = {
+            'sender': "{{ session['username'] }}",
+            'receiver': receiver,
+            'message': message
+        };
+
+        // Émettre l'événement 'send_message' avec le message JSON
+        socket.emit('send_message', json);
+
+        // Effacer le champ de saisie (déplacer ceci après avoir reçu la confirmation du serveur)
+        messageInput.value = "";
+    }
+}
+
+
+// Événement SocketIO pour recevoir des messages
+socket.on('receive_message', function(json) {
+    // Ajouter le message reçu à la boîte de chat
+    displayMessage(json.sender, json.message);
+
+    // Effacer le champ de saisie après avoir reçu le message du serveur
+    document.getElementById('message-input').value = "";
+});
+
+
+
+// Fonction pour afficher les messages reçus et envoyés
 function displayMessage(sender, content) {
     var chatBox = document.getElementById('chat-box');
     var messageDiv = document.createElement('div');
@@ -141,11 +156,13 @@ function displayMessage(sender, content) {
     messageDiv.appendChild(contentSpan);
     chatBox.appendChild(messageDiv);
 
-    // Scroll to the bottom of the chat box
+    // Faire défiler vers le bas de la boîte de chat
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// SocketIO event for receiving messages
+
+// Événement SocketIO pour recevoir des messages
 socket.on('receive_message', function(json) {
+    // Ajouter le message reçu à la boîte de chat
     displayMessage(json.sender, json.message);
 });
