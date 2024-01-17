@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request, url_for, redirect
+qfrom flask import Flask, render_template, session, request, url_for, redirect
 from flask_socketio import SocketIO, emit, join_room
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -65,7 +65,7 @@ def login():
 
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id  # Authentifier l'utilisateur
+            session['user_id'] = user.id  
             session['username'] = username
             return redirect(url_for('chat'))
         else:
@@ -157,13 +157,13 @@ def get_users():
 # Socket pour l'envoie et la réception de messages
 @socketio.on('send_message')
 def handle_send_message(json):
-    # Ajout des message dans les conversations
+    
     convo_key = (min(json['sender'], json['receiver']), max(json['sender'], json['receiver']))
     if convo_key not in conversations:
         conversations[convo_key] = []
     conversations[convo_key].append({"sender": json['sender'], "message": json['message']})
 
-    # Partages des messages à tous les utilisateurs connectés
+    
     emit('receive_message', json, broadcast=True)
 
 
