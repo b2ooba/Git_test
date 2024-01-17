@@ -3,12 +3,12 @@ PyperTalk: Application de Chat pour Développeurs
 PyperTalk est une application de messagerie instantanée conçue pour les développeurs. Elle offre un espace pour partager des problématiques, demander des conseils, et collaborer sur des défis de programmation. Que vous soyez bloqué sur un bug épineux ou simplement à la recherche d'avis sur votre code, PyperTalk est l'outil idéal pour une aide rapide et efficace.
 
 Technologies Utilisées :
-Python
-Flask
-Flask-SocketIO
-JavaScript
-HTML/CSS
-SQLite
+- Python
+- Flask
+- Flask-SocketIO
+- JavaScript
+- HTML/CSS
+- SQLite
 
 Pour installer et utiliser PyperTalk, suivez ces étapes :
 
