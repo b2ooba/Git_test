@@ -25,3 +25,6 @@ pip install -r requirements.txt
 ```
 python main.py
 ```
+Utilisation :
+
+Une fois l'application lancée, accédez à http://localhost:5000 dans votre navigateur. Créez un compte ou connectez-vous pour rejoindre les canaux de discussion.
