@@ -1,17 +1,17 @@
-/* Style pour la pop-up */
+
 .popup {
     display: none;
-    position: fixed; /* ou 'absolute' si vous voulez que la pop-up défile avec la page */
+    position: fixed; 
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 1000; /* S'assurer qu'elle est au-dessus des autres éléments */
+    z-index: 1000;
 }
 
 .popup:target {
-    display: block; /* Affiche la pop-up lorsque son ID est ciblé */
+    display: block; 
 }
 
 .popup-content {
