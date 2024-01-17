@@ -40,5 +40,5 @@ create table messages (
 CREATE TABLE conversations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ... -- Autres champs comme les participants, le statut, etc.
+    
 );
