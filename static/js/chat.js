@@ -107,25 +107,18 @@ var socket = io.connect('http://' + document.domain + ':' + location.port);
 function sendMessage() {
     var messageInput = document.getElementById('message-input');
     var message = messageInput.value.trim();
-
     if (message !== "") {
-        // Utilisez la variable de session 'username' pour définir le destinataire
-        var receiver = "{{ receiver_username }}";  // Mettez ici la logique pour choisir le destinataire
-
+        var receiver = "{{ receiver_username }}";  // Logique pour le destinataire
         var json = {
-            'sender': "{{ session['username'] }}",
+            'sender': loggedInUsername,
             'receiver': receiver,
             'message': message
         };
-
         // Émettre l'événement 'send_message' avec le message JSON
         socket.emit('send_message', json);
-
-        // Effacer le champ de saisie (déplacer ceci après avoir reçu la confirmation du serveur)
         messageInput.value = "";
     }
 }
-
 
 // Événement SocketIO pour recevoir des messages
 socket.on('receive_message', function(json) {
@@ -161,8 +154,4 @@ function displayMessage(sender, content) {
 }
 
 
-// Événement SocketIO pour recevoir des messages
-socket.on('receive_message', function(json) {
-    // Ajouter le message reçu à la boîte de chat
-    displayMessage(json.sender, json.message);
-});
+

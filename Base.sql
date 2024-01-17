@@ -36,3 +36,9 @@ create table messages (
        foreign key (conversation_id) references conversations(id_conversation),
        foreign key (sender_id) references users(id_user)
 );
+
+CREATE TABLE conversations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ... -- Autres champs comme les participants, le statut, etc.
+);

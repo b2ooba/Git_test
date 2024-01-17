@@ -6,6 +6,7 @@ from flask import jsonify
 from sqlalchemy import or_, and_
 
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Base.sql'
@@ -39,6 +40,8 @@ class Message(db.Model):
 
 # Routes
 @app.route('/')
+def home():
+    return redirect(url_for('login'))
 def index():
     username = session.get('username')
     if not username:
@@ -46,23 +49,13 @@ def index():
     
     user_friends = Friend.query.filter_by(user_id=session.get('user_id')).all()
     
-    user_conversations = {
-        friend.friend_username: Conversation.query.filter(
-            or_(
-                and_(Conversation.user1_id == session.get('user_id'), Conversation.user2_id == friend.user_id),
-                and_(Conversation.user1_id == friend.user_id, Conversation.user2_id == session.get('user_id'))
-            )
-        ).all() for friend in user_friends
-    }
-    
-    return render_template('index.html', conversations=user_conversations)
-
+    user_conversations = {friend: conversations.get((min(username, friend),max(username, friend)), []) for friend in user_friends}
+    return render_template('index.html', conversations=user_conversations, username=username)
 
 @app.route('/chat')
 def chat():
-    # Logique de la vue chat
-    return render_template('chat.html')  # Assurez-vous d'avoir le bon chemin pour votre template
-
+    username = session.get('username')
+    return render_template('chat.html', username=username)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -173,7 +166,9 @@ def handle_send_message(json):
     # Broadcast du message à tous les utilisateurs connectés
     emit('receive_message', json, broadcast=True)
 
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     socketio.run(app, debug=True)
+    

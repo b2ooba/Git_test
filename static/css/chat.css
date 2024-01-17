@@ -1,12 +1,11 @@
 /* Styles de base pour la démonstration */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-image: url("/static/images/bg_png.jpeg");
     margin: 0;
     padding: 0;
     display: flex;
 }
-
 .sidebar {
     width: 550px;
     background-color: #fff;
@@ -116,21 +115,116 @@ body {
     justify-content: space-between;
 }
 
+.connecte {
+    margin-top: -85px; /* Réduire la marge supérieure */
+    background-color: #07b50a;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+    width: 90%;
+    margin-left: 10px;
+}
+
+.friend-list-item {
+    padding: 10px;
+    margin: 5px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.friend-list-item:hover {
+    background-color: #f0f0f0;
+}
+
+.add-friend-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-friend-btn:hover {
+    background-color: #45a049;
+}
+
+.view-friends-link {
+    display: block;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.view-friends-link:hover {
+    background-color: #0056b3;
+}
+
 .chat-window {
     background-color: #fff;
     flex-grow: 1;
-    margin-bottom: 10px;
+    margin-top: 10px;
     padding-right: 200px;
     overflow-y: auto;
 }
 
-/* Ajoutez ces styles dans votre fichier CSS existant */
-
-.connecte {
-    background-color: #07b50a;
-    color: white;
+.input-box {
+    width: 100%;
     padding: 10px;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 10px;
+    box-sizing: border-box;
+
 }
+
+.chat-box {
+    /* Autres styles existants... */
+    border: 50px solid green; /* Bordure noire épaisse */
+    position: fixed; /* ou 'absolute' selon le besoin */
+    top: 0;
+    left: 0;
+}
+
+.chat-window {
+    background-color: #fff;
+    flex-grow: 1;
+    margin-top: 10px;
+    padding-right: 200px;
+    overflow-y: auto;
+    border: 10px solid rgb(172, 212, 172); /* Bordure verte épaisse */
+}
+
+.message-input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.chat-area {
+    position: fixed;
+    bottom: 10px; /* Ajustez selon vos besoins */
+    right: 5px;
+    width: 880px;
+    z-index: 1000;
+}
+
+.image-survol {
+    width: 300px;
+    transition: transform 0.5s ease;
+    margin-top: 100px;
+    margin-left: 100px;
+  }
+  
+.image-survol:hover {
+    filter: brightness(50%) invert(1);
+  }
+  
