@@ -13,13 +13,15 @@ SQLite
 Pour installer et utiliser PyperTalk, suivez ces étapes :
 
 1. Clonez le dépôt :
+```
+   git clone git@github.com:b2ooba/Git_test.git
+```
    
-   git clone [URL de votre dépôt]
 2. Installez les dépendances :
-   ```
-   pip install -r requirements.txt
-   ```
+```
+pip install -r requirements.txt
+```
 3. Lancez l'application :
-   ```
-   python main.py
-   ```
+```
+python main.py
+```
