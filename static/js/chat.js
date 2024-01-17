@@ -1,7 +1,4 @@
-// chat.js
-
 document.addEventListener('DOMContentLoaded', function () {
-    // ... Autres initialisations ...
 
     // Gestionnaire d'événements pour le bouton "Groupes"
     const groupButton = document.querySelector('#openPopupImage');
@@ -17,8 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Erreur lors de la récupération des utilisateurs:', error));
     });
 
-    // ... Autres gestionnaires d'événements ...
-});
+ });
 
 // Gestionnaire d'événements pour le bouton "Groupes"
 const groupButton = document.querySelector('#openPopupImage');
@@ -81,8 +77,6 @@ function addFriend() {
     }
 }
 
-//DEBUT FIN FONCTION AJOUT d'AMI
-
 //AJOUT FONCTION LISTE D'AMIS
 // Fonction pour afficher la liste d'amis dans un pop-up
 function viewFriends() {
@@ -98,8 +92,6 @@ function viewFriends() {
         })
         .catch(error => console.error('Erreur lors de la récupération de la liste d\'amis:', error));
 }
-
-//FIN AJOUT FONCTION LISTE D'AMIS
 
 
 var socket = io.connect('http://' + document.domain + ':' + location.port);

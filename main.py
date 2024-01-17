@@ -15,7 +15,7 @@ socketio = SocketIO(app)
 conversations = {}
 
 
-# Models
+# Modèles pour stockers les messages
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
@@ -154,16 +154,16 @@ def get_users():
 
     return jsonify(users=user_list)
 
-# SocketIO event for receiving messages
+# Socket pour l'envoie et la réception de messages
 @socketio.on('send_message')
 def handle_send_message(json):
-    # Ajout message dans 'conversations'
+    # Ajout des message dans les conversations
     convo_key = (min(json['sender'], json['receiver']), max(json['sender'], json['receiver']))
     if convo_key not in conversations:
         conversations[convo_key] = []
     conversations[convo_key].append({"sender": json['sender'], "message": json['message']})
 
-    # Broadcast du message à tous les utilisateurs connectés
+    # Partages des messages à tous les utilisateurs connectés
     emit('receive_message', json, broadcast=True)
 
 
